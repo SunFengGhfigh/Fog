@@ -1,5 +1,5 @@
 # Fog
-og is a java-baesd framework for deep learning (Java-1.8). It was done by Feng Sun and Yuyan Wang.
+Fog is a java-baesd framework for deep learning (Java-1.8). It was done by Feng Sun and Yuyan Wang.
 
 ## Some questions about Fog.
 ### 1.Why do many loops in the code?
