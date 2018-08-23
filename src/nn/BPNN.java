@@ -3,7 +3,6 @@ package nn;
 /*************************************************************************
  * 
  * @author Sun
- * @author Yuyan Wang
  * @date 2018.8
  * 
  * The library of back propagation neural network.
@@ -17,30 +16,57 @@ import math.Matrix;
 
 public class BPNN {
 	
+	// Layer dimension
 	private int[] layerDims;
 	private double learningRate;
 	private HashMap<String, Matrix> data;
+	private int iteration;
+	private int printSize;
+	private int printBatch = 10;
 	
-	public BPNN(int[] layerDims, double learningRate, HashMap<String, Matrix> data) {
+	/**
+	 * Construct method.
+	 * @param layerDims
+	 * @param learningRate
+	 * @param data
+	 * @param iteration
+	 */
+	public BPNN(int[] layerDims, double learningRate, HashMap<String, Matrix> data, int iteration) {
 		this.layerDims = layerDims;
 		this.learningRate = learningRate;
 		this.data = data;
+		this.iteration = iteration;
+		if (iteration > 20) {
+			this.printSize = iteration / printBatch;
+		} else {
+			this.printSize = 1;
+		}
 	}
 	
-	public HashMap<String, Matrix> initialize(){
+	/**
+	 * Initialize parameters include weights and biases.
+	 * When initialize the weights, the default method is random assignment.
+	 * The default value of weight rate is 1e-2.
+	 * We also provide other initialization methods, such as how the Kaiming He team proposed the initialization method (He)
+	 * and Xavier.
+	 * In practical engineering, we usually prefer He's initialization method because of it's limitations on the variance
+	 * of weights. And that is precisely the flaw of Xavier.
+	 * @return
+	 */
+	private HashMap<String, Matrix> initialize(){
 		HashMap<String, Matrix> parameters = new HashMap<>(4 * layerDims.length);
 		Matrix train_X = data.get("train_X");
 		parameters.put("A0", train_X);
-		for (int i = 1; i < layerDims.length; i++) {
-			Matrix W = new Matrix(layerDims[i], layerDims[i - 1], "random");
-			Matrix b = new Matrix(layerDims[i], 1);
-			parameters.put("W" + i, W);
-			parameters.put("b" + i, b);
-		}
+		parameters = Expansion.initialize(parameters, layerDims);
 		return parameters;
 	}
 	
-	public HashMap<String, Matrix> forwardPropagation(HashMap<String, Matrix> parameters) {
+	/**
+	 * Forward propagation.
+	 * @param parameters
+	 * @return
+	 */
+	private HashMap<String, Matrix> forwardPropagation(HashMap<String, Matrix> parameters) {
 		for (int i = 1; i < layerDims.length; i++) {
 			Matrix W = parameters.get("W" + i);
 			Matrix b = parameters.get("b" + i);
@@ -58,14 +84,27 @@ public class BPNN {
 		return parameters;
 	}
 	
-	public Matrix loss(HashMap<String, Matrix> parameters) {
+	/**
+	 * 
+	 * @param parameters
+	 * @return
+	 */
+	private Matrix loss(HashMap<String, Matrix> parameters) {
 		Matrix y_hat = parameters.get(("A" + (layerDims.length - 1)));
 		Matrix y = data.get("train_y");
 		Matrix result = Expansion.crossEntropy(y_hat, y);
 		return result;
 	}
 	
-	public HashMap<String, Matrix> backpropagtion(HashMap<String, Matrix> parameters){
+	/**
+	 * Back propagation.
+	 * This is just one example: ReLU -> Sigmoid -> Cross Entropy.
+	 * So, we haven't finished the automatic derivation part yet, but the demo is done and ready
+	 * to run. We're working on the details.
+	 * @param parameters
+	 * @return
+	 */
+	private HashMap<String, Matrix> backpropagtion(HashMap<String, Matrix> parameters){
 		Matrix train_X = data.get("train_X");
 		Matrix train_y = data.get("train_y");
 		int m = train_X.width;
@@ -96,7 +135,12 @@ public class BPNN {
 		return parameters;
 	}
 	
-	public HashMap<String, Matrix> update(HashMap<String, Matrix> parameters){
+	/**
+	 * Update weights and biases.
+	 * @param parameters
+	 * @return
+	 */
+	private HashMap<String, Matrix> update(HashMap<String, Matrix> parameters){
 		for (int i = 1; i < layerDims.length; i++) {
 			Matrix W = parameters.get("W" + i);
 			Matrix b = parameters.get("b" + i);
@@ -106,6 +150,85 @@ public class BPNN {
 			parameters.put("b" + i, db.dot(-1.0d * learningRate).add(b));
 		}
 		return parameters;
+	}
+	
+	/**
+	 * Train the model.
+	 * @return
+	 */
+	public HashMap<String, Matrix> train() {
+		HashMap<String, Matrix> parameters = initialize();
+		
+		for (int i = 0; i < this.iteration; i++) {
+			parameters = forwardPropagation(parameters);
+			if (i % this.printSize == 0) {
+				Matrix cost = loss(parameters);
+				System.out.println("------------" + i + "------------");
+				System.out.println("loss:" + cost.sum());
+			}
+			parameters = backpropagtion(parameters);
+			parameters = update(parameters);
+		}
+		
+		return parameters;
+	}
+	
+	/**
+	 * Predict the train data.
+	 * @param parameters
+	 */
+	public void predictTrain(HashMap<String, Matrix> parameters) {
+		parameters = forwardPropagation(parameters);
+		int L = layerDims.length;
+		Matrix y_hat = parameters.get("A" + (L - 1));
+		System.out.println(y_hat);
+	}
+	
+	/**
+	 * Predict the validation data.
+	 * @param parameters
+	 */
+	public void predictValidation(HashMap<String, Matrix> parameters) {
+		parameters.put("A0", data.get("val_X"));
+		parameters = forwardPropagation(parameters);
+		int L = layerDims.length;
+		Matrix y_hat = parameters.get("A" + (L - 1));
+		System.out.println(y_hat);
+	}
+	
+	/*************************************************************************
+	 *  Configure.
+	 *************************************************************************/
+	
+	/**
+	 * Choose the random initialization parameter.
+	 * The default value of weightRate is 1e-2.
+	 * @param weightRate
+	 */
+	public void initializeRandom(double weightRate) {
+		Const.random = true;
+		Const.weightRate = weightRate;
+	}
+	
+	/**
+	 * Choose He's method initialization parameter.
+	 */
+	public void He() {
+		Const.He = true;
+	}
+	
+	/**
+	 * Choose Xavier method initialization parameter.
+	 */
+	public void Xavier() {
+		Const.Xavier = true;
+	}
+	
+	/**
+	 * Select tanh as the activation function.
+	 */
+	public void tanh() {
+		Const.tanh = true;
 	}
 	
 }
