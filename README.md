@@ -16,9 +16,9 @@ No.
 ### Matrix (math.Matrix)
 #### math.Matrix(int height, int width, String...type)
 parameters:<br/>
-height: The height of matrix.<br/>
-width: The width of matrix.<br/>
-type: Type is an optional parameter. You can choose 'random' or 'randn' or 'like someNumber'. 'random' means that the values in the matrix present a gaussian distribution. 'randn' means that the values in the matrix are randomly distribution in [0,1]<br/>
+<i>height</i>: The height of matrix.<br/>
+<i>width</i>: The width of matrix.<br/>
+<i>type</i>: Type is an optional parameter. You can choose 'random' or 'randn' or 'like someNumber'. 'random' means that the values in the matrix present a gaussian distribution. 'randn' means that the values in the matrix are randomly distribution in [0,1]. If you choose 'like someNumber', the matrix will fill in some value. Example: K = new Matrix(2, 2, "like 9"), K = [[9, 9], [9, 9]<br/>
 
 # Fog（中文版）
 Fog是一个基于Java的深度学习傻瓜化框架，Java版本为1.8
