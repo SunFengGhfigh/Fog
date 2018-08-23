@@ -27,11 +27,20 @@ No.
 * return the sum of the elements of the matrix.
 #### math.Matrix.sum(int axis)
 <b>Args</b>:<br/>
-* `axis`: The mark of horizontal or vertical. 0 means vertica, 1 means horizontal. Example: if K = [[1, 2], [3, 4]], P = K.sum(0), P = [[4, 6]]<br/>
+* `axis`: The mark of horizontal or vertical. 0 means vertica, 1 means horizontal. Example: if K = [[1, 2], [3, 4]], P = K.sum(0), P = [[4, 6]]
 <b>Returns</b>:<br/>
 * The sum.
-
-
+#### math.Matrix.avg()
+<b>Returns</b>:<br/>
+* The average value of the elements in the matrix.
+#### math.Matrix.log()
+<b>Returns</b>:<br/>
+* Returns the logarithmic matrix of the matrix.
+#### math.Matrix.add(double number)
+<b>Args</b>:<br/>
+* `number`: The value you need to add to each element of the matrix.
+<b>Returns</b>:<br/>
+* Return a new matrix.
 
 
 
