@@ -42,6 +42,8 @@ public class Matrix {
 				randomArray();
 			} else if (type[0].indexOf("like") > -1) {
 				specifyArray(type[0]);
+			} else if (type[0].equals("randn")) {
+				randnArray();
 			}
 		} else if (typeLength != 0){
 			System.err.println("Initialize matrix ERROR: Instruction is invalid! -> " + Arrays.toString(type));
@@ -82,6 +84,21 @@ public class Matrix {
 		for (int i = 0; i < this.height; i++) {
 			for (int j = 0; j < this.width; j++) {
 				this.array[i][j] = random.nextGaussian();
+			}
+		}
+	}
+	
+	/**
+	 * Get a randn array.
+	 */
+	private void randnArray() {
+		Random random = new Random();
+		for (int i = 0; i < this.height; i++) {
+			for (int j = 0; j < this.width; j++) {
+				this.array[i][j] = random.nextGaussian();
+				if (this.array[i][j] < 0) {
+					this.array[i][j] *= -1;
+				}
 			}
 		}
 	}
@@ -305,7 +322,7 @@ public class Matrix {
 					sum += (a.array[0][i] * b.array[i][0]);
 				}
 			} else {
-				System.out.println("opMultiOrDivOneLine Error:³Ë·¨»ò³ý·¨²Ù×÷´íÎó£¬Î¬¶È²»Æ¥Åä");
+				System.out.println("opMultiOrDivOneLine Error:ä¹˜æ³•æˆ–é™¤æ³•æ“ä½œé”™è¯¯ï¼Œç»´åº¦ä¸åŒ¹é…");
 			}
 		}
 		return sum;
