@@ -10,3 +10,5 @@ You can see it in README.md. We provide the Chinese version, the second part in 
 You only need to download the source of code or download the 'Fog.jar' we provided.
 ### 4.Why do many loops in the code?
 We created 'Fog' without considering the inefficiencies of Java (Not in the broad sense). Because java would not be the mainstream of deep learning in the future. We want to use this framework to show some the classical algorithms in deep learning. In addition, Java programs run on the Java virtual machine (JVM) and are limited by the resources acquired by the JVM. If we carefully adjust the code, we also need to adjust the virtual machine parameters of the framework runtime. It makes us feel like we're putting the cart before the horse.
+### 5.Will you continue to maintain this program?
+No.
