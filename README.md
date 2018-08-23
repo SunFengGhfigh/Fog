@@ -18,8 +18,10 @@ No.
 <b>Args</b>:<br/>
 * `height`: The height of matrix.<br/>
 * `width`: The width of matrix.<br/>
-* `type`: Type is an optional parameter. You can choose 'random' or 'randn' or 'like someNumber'. 'random' means that the values in the matrix present a gaussian distribution. 'randn' means that the values in the matrix are randomly distribution in [0,1]. If you choose 'like someNumber', the matrix will fill in some value. Example: K = new Matrix(2, 2, "like 9"), K = [[9, 9], [9, 9]<br/>
-
+* `type`: Type is an optional parameter. You can choose 'random' or 'randn' or 'like someNumber'. 'random' means that the values in the matrix present a gaussian distribution. 'randn' means that the values in the matrix are randomly distribution in [0,1]. If you choose 'like someNumber', the matrix will fill in some value. Example: K = new Matrix(2, 2, "like 9"), K = [[9, 9], [9, 9]
+#### math.Matrix(String config)
+<b>Args</b>:<br/>
+* 'config': Same as numpy.array(). Example: if you want a matrix like that `[[1, 2], [3, 4]]`, you should : K = new Matrix("[[1,2], [3, 4]")
 # Fog（中文版）
 Fog是一个基于Java的深度学习傻瓜化框架，Java版本为1.8
 ## 一些关于Fog的问题
