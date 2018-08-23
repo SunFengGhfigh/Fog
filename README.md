@@ -22,6 +22,26 @@ No.
 #### math.Matrix(String config)
 <b>Args</b>:<br/>
 * `config`: Same as numpy.array(). Example: if you want a matrix like that `[[1, 2], [3, 4]]`, you should : K = new Matrix("[[1,2], [3, 4]"). You can choose whether to add spaces with your preferences.
+#### math.Matrix.sum()
+<b>Return</b>:<br/>
+* return the sum of the elements of the matrix.
+#### math.Matrix.sum(int axis)
+<b>Args</b>:<br/>
+* `axis`: The mark of horizontal or vertical. 0 means vertica, 1 means horizontal. Example: if K = [[1, 2], [3, 4]], P = K.sum(0), P = [[4, 6]]<br/>
+<b>Returns</b>:<br/>
+* The sum.
+
+
+
+
+
+
+
+
+
+
+
+
 # Fog（中文版）
 Fog是一个基于Java的深度学习傻瓜化框架，Java版本为1.8
 ## 一些关于Fog的问题
