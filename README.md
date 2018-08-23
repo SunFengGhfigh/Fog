@@ -12,6 +12,14 @@ You only need to download the source of code or download the 'Fog.jar' we provid
 We created 'Fog' without considering the inefficiencies of Java (Not in the broad sense). Because java would not be the mainstream of deep learning in the future. We want to use this framework to show some the classical algorithms in deep learning. In addition, Java programs run on the Java virtual machine (JVM) and are limited by the resources acquired by the JVM. If we carefully adjust the code, we also need to adjust the virtual machine parameters of the framework runtime. It makes us feel like we're putting the cart before the horse.
 ### 5.Will you continue to maintain this program?
 No.
+## API
+### Matrix (math.Matrix)
+#### math.Matrix(int height, int width, String...type)
+parameters:<br/>
+height: The height of matrix.
+width: The width of matrix.
+type: Type is an optional parameter. You can choose 'random' or 'randn' or 'like someNumber'. 'random' means that the values in the matrix present a gaussian distribution.
+
 # Fog（中文版）
 Fog是一个基于Java的深度学习傻瓜化框架，Java版本为1.8
 ## 一些关于Fog的问题
