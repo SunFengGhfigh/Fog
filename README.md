@@ -4,7 +4,7 @@ Fog is a java-baesd framework for deep learning (Java-1.8). It was done by Feng 
 ## Some questions about Fog.
 ### 1.Why use Java programming frameworks?
 I had been practicing Java for two years, I am familiar with Java. Programming language is just a tool, don't care what use language coding algorithm. But to be honest, Python is much better at matrix support than Java. In the actual production process, we usually use Python, Lua and Matlab for deep learning programming.
-### 2.Where can I review a document about 'Fog'? Have Chinese version?
+### 2.Where can I review API about 'Fog'? Have Chinese version?
 You can see it in README.md. We provide the Chinese version, the second part in the article.
 ### 3.How to use the 'Fog'
 You only need to download the source of code or download the 'Fog.jar' we provided.
