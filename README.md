@@ -14,33 +14,33 @@ We created 'Fog' without considering the inefficiencies of Java (Not in the broa
 No.
 ## API
 ### Matrix (math.Matrix)
-#### math.Matrix(int height, int width, String...type)
+#### `math.Matrix(int height, int width, String...type)`
 <b>Args</b>:<br/>
 * `height`: The height of matrix.<br/>
 * `width`: The width of matrix.<br/>
 * `type`: Type is an optional parameter. You can choose 'random' or 'randn' or 'like someNumber'. 'random' means that the values in the matrix present a gaussian distribution. 'randn' means that the values in the matrix are randomly distribution in [0,1]. If you choose 'like someNumber', the matrix will fill in some value. Example: K = new Matrix(2, 2, "like 9"), K = [[9, 9], [9, 9]
 ---
-#### math.Matrix(String config)
+#### `math.Matrix(String config)`
 <b>Args</b>:<br/>
 * `config`: Same as numpy.array(). Example: if you want a matrix like that `[[1, 2], [3, 4]]`, you should : K = new Matrix("[[1,2], [3, 4]"). You can choose whether to add spaces with your preferences.
 ---
-#### math.Matrix.sum()
+#### `math.Matrix.sum()`
 <b>Return</b>:<br/>
 * return the sum of the elements of the matrix.
 ---
-#### math.Matrix.sum(int axis)
+#### `math.Matrix.sum(int axis)`
 <b>Args</b>:<br/>
 * `axis`: The mark of horizontal or vertical. 0 means vertica, 1 means horizontal. Example: if K = [[1, 2], [3, 4]], P = K.sum(0), P = [[4, 6]]<br/>
 ---
-#### math.Matrix.avg()
+#### `math.Matrix.avg()`
 <b>Returns</b>:<br/>
 * The average value of the elements in the matrix.
 ---
-#### math.Matrix.log()
+#### `math.Matrix.log()`
 <b>Returns</b>:<br/>
 * Returns the logarithmic matrix of the matrix.
 ---
-#### math.Matrix.add(double number)
+#### `math.Matrix.add(double number)`
 <b>Args</b>:<br/>
 * `number`: The value you need to add to each element of the matrix.<br/>
 ---
