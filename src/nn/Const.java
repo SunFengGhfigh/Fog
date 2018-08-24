@@ -19,6 +19,9 @@ public class Const {
 	public static boolean He = false;
 	public static boolean Xavier = false;
 	
-	// Activation flags.
-	public static boolean tanh = false;
+	// loss function
+	public static boolean crossEntropy = false;
+	public static boolean L2 = false;
+	public static boolean L1 = false;
+	
 }
