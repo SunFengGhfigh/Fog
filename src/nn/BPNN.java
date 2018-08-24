@@ -92,7 +92,7 @@ public class BPNN {
 	private Matrix loss(HashMap<String, Matrix> parameters) {
 		Matrix y_hat = parameters.get(("A" + (layerDims.length - 1)));
 		Matrix y = data.get("train_y");
-		Matrix result = Expansion.crossEntropy(y_hat, y);
+		Matrix result = Expansion.loss(y_hat, y);
 		return result;
 	}
 	
@@ -105,33 +105,8 @@ public class BPNN {
 	 * @return
 	 */
 	private HashMap<String, Matrix> backpropagtion(HashMap<String, Matrix> parameters){
-		Matrix train_X = data.get("train_X");
 		Matrix train_y = data.get("train_y");
-		int m = train_X.width;
-		
-		for (int i = layerDims.length - 1; i > 0; i--) {
-			Matrix dZ, dW, db;
-			if (i == layerDims.length - 1) {
-				Matrix temp = train_y.dot(-1);
-				Matrix A = parameters.get("A" + i);
-				dZ = A.add(temp);
-				Matrix prevA = parameters.get("A" + (i - 1));
-				dW = dZ.dot(prevA.T()).dot(1.0d/m);
-				db = dZ.sum(1).dot(1.0d/m);
-			} else {
-				Matrix W = parameters.get("W" + (i + 1));
-				Matrix prevdZ = parameters.get("dZ" + (i + 1));
-				Matrix dA = W.T().dot(prevdZ);
-				dZ = Expansion.relu(dA);
-				Matrix prevA = parameters.get("A" + (i - 1));
-				dW = dZ.dot(prevA.T()).dot(1.0d/m);
-				db = dZ.sum(1).dot(1.0d/m);
-			}
-			parameters.put("dZ" + i, dZ);
-			parameters.put("dW" + i, dW);
-			parameters.put("db" + i, db);
-		}
-		
+		parameters = Expansion.backwardPropagation(parameters, layerDims, train_y);
 		return parameters;
 	}
 	
@@ -225,10 +200,24 @@ public class BPNN {
 	}
 	
 	/**
-	 * Select tanh as the activation function.
+	 * Choose cross entropy loss function.
 	 */
-	public void tanh() {
-		Const.tanh = true;
+	public void cross_entropy() {
+		Const.crossEntropy = true;
+	}
+	
+	/**
+	 * Choose L2 loss function.
+	 */
+	public void L2() {
+		Const.L2 = true;
+	}
+	
+	/**
+	 * Choose L1 loss function.
+	 */
+	public void L1() {
+		Const.L1 = true;
 	}
 	
 }
