@@ -1,5 +1,7 @@
 package nn;
 
+import java.io.File;
+
 /*************************************************************************
  * 
  * @author Sun
@@ -85,15 +87,19 @@ public class BPNN {
 	}
 	
 	/**
-	 * 
+	 * Loss function.
 	 * @param parameters
 	 * @return
 	 */
-	private Matrix loss(HashMap<String, Matrix> parameters) {
+	private double loss(HashMap<String, Matrix> parameters) {
 		Matrix y_hat = parameters.get(("A" + (layerDims.length - 1)));
 		Matrix y = data.get("train_y");
 		Matrix result = Expansion.loss(y_hat, y);
-		return result;
+		double sum = result.sum();
+		if (Const.L2regularization) {
+			sum += Expansion.L2regularization(layerDims, parameters, Const.lambda);
+		}
+		return sum;
 	}
 	
 	/**
@@ -137,9 +143,9 @@ public class BPNN {
 		for (int i = 0; i < this.iteration; i++) {
 			parameters = forwardPropagation(parameters);
 			if (i % this.printSize == 0) {
-				Matrix cost = loss(parameters);
+				double cost = loss(parameters);
 				System.out.println("------------" + i + "------------");
-				System.out.println("loss:" + cost.sum());
+				System.out.println("loss:" + cost);
 			}
 			parameters = backpropagtion(parameters);
 			parameters = update(parameters);
@@ -219,5 +225,34 @@ public class BPNN {
 	public void L1() {
 		Const.L1 = true;
 	}
+	
+	/**
+	 * Choose L2 regularization.
+	 */
+	public void L2Regularization(double lambda) {
+		Const.L2regularization = true;
+		Const.lambda = lambda;
+	}
+	
+	/**
+	 * Choose dropout regularization.
+	 */
+	public void dropout() {
+		Const.dropout = true;
+	}
+	
+	/*************************************************************************
+	 *  Save model or read model.
+	 *************************************************************************/
+	public void saveModel(String pathname) {
+		File file = new File(pathname);
+		file.mkdirs();
+		// 序列化
+	}
+	
+	public BPNN readmodel() {
+		return null;
+	}
+	
 	
 }
