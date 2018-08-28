@@ -1,6 +1,12 @@
 package nn;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 
 /*************************************************************************
  * 
@@ -12,11 +18,13 @@ import java.io.File;
  *************************************************************************/
 
 import java.util.HashMap;
+import java.util.List;
 
 import math.Expansion;
 import math.Matrix;
+import plot.Plt;
 
-public class BPNN {
+public class BPNN implements java.io.Serializable{
 	
 	// Layer dimension
 	private int[] layerDims;
@@ -25,6 +33,11 @@ public class BPNN {
 	private int iteration;
 	private int printSize;
 	private int printBatch = 10;
+	private HashMap<String, Matrix> parameters;
+	private boolean isPlot;
+	private int batchSize = 64;
+	// Serialize.
+	public static final long serialVersionUID = 997591450L; 
 	
 	/**
 	 * Construct method.
@@ -33,7 +46,7 @@ public class BPNN {
 	 * @param data
 	 * @param iteration
 	 */
-	public BPNN(int[] layerDims, double learningRate, HashMap<String, Matrix> data, int iteration) {
+	public BPNN(int[] layerDims, double learningRate, HashMap<String, Matrix> data, int iteration, boolean isPlot) {
 		this.layerDims = layerDims;
 		this.learningRate = learningRate;
 		this.data = data;
@@ -43,6 +56,7 @@ public class BPNN {
 		} else {
 			this.printSize = 1;
 		}
+		this.isPlot = isPlot;
 	}
 	
 	/**
@@ -60,6 +74,7 @@ public class BPNN {
 		Matrix train_X = data.get("train_X");
 		parameters.put("A0", train_X);
 		parameters = Expansion.initialize(parameters, layerDims);
+		this.parameters = parameters;
 		return parameters;
 	}
 	
@@ -83,6 +98,7 @@ public class BPNN {
 			parameters.put("Z" + i, Z);
 			parameters.put("A" + i, A);
 		}
+		this.parameters = parameters;
 		return parameters;
 	}
 	
@@ -91,9 +107,8 @@ public class BPNN {
 	 * @param parameters
 	 * @return
 	 */
-	private double loss(HashMap<String, Matrix> parameters) {
+	private double loss(HashMap<String, Matrix> parameters, Matrix y) {
 		Matrix y_hat = parameters.get(("A" + (layerDims.length - 1)));
-		Matrix y = data.get("train_y");
 		Matrix result = Expansion.loss(y_hat, y);
 		double sum = result.sum();
 		if (Const.L2regularization) {
@@ -110,9 +125,10 @@ public class BPNN {
 	 * @param parameters
 	 * @return
 	 */
-	private HashMap<String, Matrix> backpropagtion(HashMap<String, Matrix> parameters){
-		Matrix train_y = data.get("train_y");
+	private HashMap<String, Matrix> backpropagtion(HashMap<String, Matrix> parameters, Matrix y){
+		Matrix train_y = y;
 		parameters = Expansion.backwardPropagation(parameters, layerDims, train_y);
+		this.parameters = parameters;
 		return parameters;
 	}
 	
@@ -130,6 +146,7 @@ public class BPNN {
 			parameters.put("W" + i, dW.dot(-1.0d * learningRate).add(W));
 			parameters.put("b" + i, db.dot(-1.0d * learningRate).add(b));
 		}
+		this.parameters = parameters;
 		return parameters;
 	}
 	
@@ -139,18 +156,59 @@ public class BPNN {
 	 */
 	public HashMap<String, Matrix> train() {
 		HashMap<String, Matrix> parameters = initialize();
+		Matrix y = data.get("train_y");
+		Matrix x = data.get("train_X");
+		int size = y.width;
+		List<Double> iterationList = new ArrayList<>();
+		List<Double> lossList = new ArrayList<>();
 		
-		for (int i = 0; i < this.iteration; i++) {
-			parameters = forwardPropagation(parameters);
-			if (i % this.printSize == 0) {
-				double cost = loss(parameters);
-				System.out.println("------------" + i + "------------");
-				System.out.println("loss:" + cost);
+		if (size <= 2000) {
+			for (int i = 0; i < this.iteration; i++) {
+				parameters = forwardPropagation(parameters);
+				double cost = loss(parameters, y);
+				if (i % this.printSize == 0) {
+					System.out.println("------------" + i + "------------");
+					System.out.println("loss:" + cost);
+					iterationList.add((double)i);
+					lossList.add(cost);
+				}
+				parameters = backpropagtion(parameters, y);
+				parameters = update(parameters);
 			}
-			parameters = backpropagtion(parameters);
-			parameters = update(parameters);
+		} else {
+			int cycle = (int)Math.floor(size / batchSize);
+			int tag = 0;
+			for (int i = 0; i < this.iteration; i++) {
+				for (int j = 0; j < cycle; j++) {
+					int startIndex = j * batchSize;
+					int endIndex = startIndex + batchSize - 1;
+					if (endIndex > size) {
+						endIndex = size - 1;
+					}
+					Matrix Xd = x.sub(":, " + startIndex + ":" + endIndex);
+					Matrix yd = y.sub(":, " + startIndex + ":" + endIndex);
+					parameters.put("A0", Xd);
+					parameters = forwardPropagation(parameters);
+					double cost = loss(parameters, yd);
+					if (i % this.printSize == 0) {
+						System.out.println("------------" + i + "------------");
+						System.out.println("loss:" + cost);
+						iterationList.add((double)tag++);
+						lossList.add(cost);
+					}
+					parameters = backpropagtion(parameters, yd);
+					parameters = update(parameters);
+				}
+			}
 		}
-		
+		Matrix plt = new Matrix(iterationList.size(), 2);
+		double[][] array = plt.getArray();
+		for (int k = 0; k < iterationList.size(); k++) {
+			array[k][0] = iterationList.get(k);
+			array[k][1] = lossList.get(k);
+		}
+		plt.setArray(array);
+		if (isPlot) {Plt.plot(plt);}
 		return parameters;
 	}
 	
@@ -158,7 +216,8 @@ public class BPNN {
 	 * Predict the train data.
 	 * @param parameters
 	 */
-	public void predictTrain(HashMap<String, Matrix> parameters) {
+	public void predictTrain() {
+		parameters.put("A0", data.get("train_X"));
 		parameters = forwardPropagation(parameters);
 		int L = layerDims.length;
 		Matrix y_hat = parameters.get("A" + (L - 1));
@@ -169,7 +228,7 @@ public class BPNN {
 	 * Predict the validation data.
 	 * @param parameters
 	 */
-	public void predictValidation(HashMap<String, Matrix> parameters) {
+	public void predictValidation() {
 		parameters.put("A0", data.get("val_X"));
 		parameters = forwardPropagation(parameters);
 		int L = layerDims.length;
@@ -244,15 +303,77 @@ public class BPNN {
 	/*************************************************************************
 	 *  Save model or read model.
 	 *************************************************************************/
+	
+	/**
+	 * Save model to file.
+	 * @param pathname
+	 */
 	public void saveModel(String pathname) {
 		File file = new File(pathname);
-		file.mkdirs();
-		// 序列化
+		try {
+			FileOutputStream fileOut = new FileOutputStream(file);
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			out.writeObject(this);
+			out.close();
+			fileOut.close();
+			System.out.println("Serialized data is saved in " + pathname);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
-	public BPNN readmodel() {
-		return null;
+	/**
+	 * Read model from file.
+	 * @param pathname
+	 * @return
+	 */
+	public static BPNN readmodel(String pathname) {
+		BPNN bpnn = null;
+		File file = new File(pathname);
+		try {
+			FileInputStream fileIn = new FileInputStream(file);
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			bpnn = (BPNN) in.readObject();
+			in.close();
+			fileIn.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		} catch (ClassNotFoundException e) {
+			System.out.println("BPNN class not found!");
+			e.printStackTrace();
+			return null;
+		}
+		return bpnn;
 	}
+
 	
+	/*************************************************************************
+	 *  Get & Set.
+	 *************************************************************************/
+	
+	public HashMap<String, Matrix> getData() {
+		return data;
+	}
+
+	public void setData(HashMap<String, Matrix> data) {
+		this.data = data;
+	}
+
+	public HashMap<String, Matrix> getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(HashMap<String, Matrix> parameters) {
+		this.parameters = parameters;
+	}
+
+	public void setBatchSize(int batchSize) {
+		this.batchSize = batchSize;
+	}
+
+	public void setPrintSize(int printSize) {
+		this.printSize = printSize;
+	}
 	
 }
